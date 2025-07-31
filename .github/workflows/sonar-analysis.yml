@@ -1,38 +1,41 @@
-name: SonarQube Scan
+name: SonarCloud Analysis
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
 
 jobs:
-  sonarQubeScan:
-    name: SonarQube Analysis
+  sonarcloud:
+    name: SonarCloud Scan
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Java
+      - name: Set up Java (required by SonarScanner)
         uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
           java-version: '17'
-          distribution: 'adopt'
 
       - name: Download SonarScanner
         run: |
+          mkdir -p sonar-scanner
           curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-          unzip sonar-scanner.zip
-          mv sonar-scanner-* sonar-scanner
+          unzip -q sonar-scanner.zip -d sonar-scanner
+          mv sonar-scanner/sonar-scanner-* sonar-scanner/bin
 
-      - name: Run SonarQube Scan
+      - name: Run SonarScanner
         env:
-          SONAR_TOKEN: squ_8b6788b1617a4579b99d9749c2227518ad9514e7
-          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_TOKEN: 248faf424716ef93f7f60661a51b0455456643d2
         run: |
           ./sonar-scanner/bin/sonar-scanner \
-            -Dsonar.projectKey=your_project_key \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.projectKey=shambhoshiva_devops-practice \
+            -Dsonar.organization=shambhoshiva \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=248faf424716ef93f7f60661a51b0455456643d2
